@@ -1,0 +1,246 @@
+{
+  "host": [
+    {
+      "address": "host1.com",
+      "certificate": {
+        "organization": "rhev.lab.eng.brq.redhat.com",
+        "subject": "O=rhev.lab.eng.brq.redhat.com,CN=10-34-61-165.rhev.lab.eng.brq.redhat.com"
+      },
+      "status": {
+        "state": "up"
+      },
+      "external_status": {
+        "state": "ok"
+      },
+      "cluster": {
+        "href": "/ovirt-engine/api/clusters/00000002-0002-0002-0002-000000000222",
+        "id": "cluster1_id"
+      },
+      "port": "54321",
+      "type": "rhel",
+      "storage_manager": {
+        "value": "true",
+        "priority": "5"
+      },
+      "spm": {
+        "priority": "5",
+        "status": {
+          "state": "spm"
+        }
+      },
+      "version": {
+        "major": "4",
+        "minor": "17",
+        "build": "24",
+        "revision": "0",
+        "full_version": "vdsm-4.17.24-1.git6437361.el7.centos"
+      },
+      "hardware_information": {
+        "manufacturer": "Red Hat",
+        "version": "7.1-1.el7",
+        "serial_number": "0103A4A5-91FE-D511-A0F0-80C16E7243EA",
+        "product_name": "RHEV Hypervisor",
+        "uuid": "a86fe00f-f753-4b7e-85c4-6431abef36d7",
+        "family": "Red Hat Enterprise Linux",
+        "supported_rng_sources": {
+          "source": [
+            "RANDOM"
+          ]
+        }
+      },
+      "power_management": {
+        "enabled": "false",
+        "pm_proxies": {},
+        "automatic_pm_enabled": "true",
+        "kdump_detection": "true"
+      },
+      "ksm": {
+        "enabled": "true"
+      },
+      "transparent_hugepages": {
+        "enabled": "true"
+      },
+      "iscsi": {
+        "initiator": "iqn.1994-05.com.redhat:97f5e88121f"
+      },
+      "ssh": {
+        "port": "22",
+        "fingerprint": "SHA256:rEJbhkfbMKFBKZkf5vIBfAK6iiS3SsIKX5vEtgEjhw8"
+      },
+      "cpu": {
+        "topology": {
+          "sockets": "1",
+          "cores": "1",
+          "threads": "1"
+        },
+        "name": "Intel Core i7 9xx (Nehalem Class Core i7)",
+        "speed": 2133
+      },
+      "memory": 3973054464,
+      "max_scheduling_memory": 564133888,
+      "summary": {
+        "active": "1",
+        "migrating": "0",
+        "total": "1"
+      },
+      "protocol": "stomp",
+      "os": {
+        "version": {
+          "full_version": "7.2 - 9.el7"
+        },
+        "type": "RHEL"
+      },
+      "libvirt_version": {
+        "major": "1",
+        "minor": "2",
+        "build": "17",
+        "revision": "0",
+        "full_version": "libvirt-1.2.17-13.el7_2.3"
+      },
+      "kdump_status": "disabled",
+      "selinux": {
+        "mode": "enforcing"
+      },
+      "auto_numa_status": "disable",
+      "numa_supported": "false",
+      "live_snapshot_support": "true",
+      "update_available": "true",
+      "device_passthrough": {
+        "enabled": "false"
+      },
+      "actions": {
+        "link": [
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/fence",
+            "rel": "fence"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/upgrade",
+            "rel": "upgrade"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/approve",
+            "rel": "approve"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/setupnetworks",
+            "rel": "setupnetworks"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/forceselectspm",
+            "rel": "forceselectspm"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/enrollcertificate",
+            "rel": "enrollcertificate"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/iscsilogin",
+            "rel": "iscsilogin"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/unregisteredstoragedomainsdiscover",
+            "rel": "unregisteredstoragedomainsdiscover"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/iscsidiscover",
+            "rel": "iscsidiscover"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/commitnetconfig",
+            "rel": "commitnetconfig"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/refresh",
+            "rel": "refresh"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/install",
+            "rel": "install"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/activate",
+            "rel": "activate"
+          },
+          {
+            "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/deactivate",
+            "rel": "deactivate"
+          }
+        ]
+      },
+      "name": "hosted_engine_1",
+      "comment": "",
+      "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411",
+      "id": "5dd7201f-5d00-4512-8776-5c46ab763411",
+      "link": [
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/storage",
+          "rel": "storage"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/nics",
+          "rel": "nics"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/numanodes",
+          "rel": "numanodes"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/tags",
+          "rel": "tags"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/permissions",
+          "rel": "permissions"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/statistics",
+          "rel": "statistics"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/hooks",
+          "rel": "hooks"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/fenceagents",
+          "rel": "fenceagents"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/katelloerrata",
+          "rel": "katelloerrata"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/devices",
+          "rel": "devices"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/networkattachments",
+          "rel": "networkattachments"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/unmanagednetworks",
+          "rel": "unmanagednetworks"
+        },
+        {
+          "href": "/ovirt-engine/api/hosts/5dd7201f-5d00-4512-8776-5c46ab763411/storageconnectionextensions",
+          "rel": "storageconnectionextensions"
+        }
+      ]
+    },
+  {
+      "address": "host2.com",
+     "cluster": {
+        "href": "/ovirt-engine/api/clusters/00000002-0002-0002-0002-000000000222",
+        "id": "cluster2_id"
+      }
+  },
+  {
+      "address": "host3.com",
+     "cluster": {
+        "href": "/ovirt-engine/api/clusters/00000002-0002-0002-0002-000000000222",
+        "id": "cluster2_id"
+      }
+  }
+
+  ]
+}

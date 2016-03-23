@@ -1,0 +1,19 @@
+[
+  {
+    "targets": [
+      "host1.com"
+    ],
+    "labels": {
+      "cluster": "cluster1_id"
+    }
+  },
+  {
+    "targets": [
+      "host2.com",
+      "host3.com"
+    ],
+    "labels": {
+      "cluster": "cluster2_id"
+    }
+  }
+]
