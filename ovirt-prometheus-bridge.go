@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -31,13 +32,16 @@ type Cluster struct {
 
 func main() {
 	target := flag.String("output", "engine-hosts.json", "target for the configuration file")
-	engineURL := flag.String("engine-url", "https://localhost:8443", "Where to find the engine")
-	engineUser := flag.String("engine-user", "admin@internal", "User")
-	enginePassword := flag.String("engine-password", "engine", "Password")
+	engineURL := flag.String("engine-url", "https://localhost:8443", "Engine URL")
+	engineUser := flag.String("engine-user", "admin@internal", "Engine user")
+	flagEnginePassword := flag.String("engine-password", "engine", "Engine password. Consider using ENGINE_PASSWORD environment variable to set this")
 	noVerify := flag.Bool("no-verify", false, "Don't verify the engine certificate")
 	engineCa := flag.String("engine-ca", "/etc/pki/vdsm/certs/cacert.pem", "Path to engine ca certificate")
-
 	flag.Parse()
+	enginePassword := os.Getenv("ENGINE_PASSWORD")
+	if enginePassword == "" {
+		enginePassword = *flagEnginePassword
+	}
 
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: *noVerify,
@@ -49,7 +53,7 @@ func main() {
 		roots := x509.NewCertPool()
 		ok := roots.AppendCertsFromPEM(readFile(*engineCa))
 		if !ok {
-			panic("Could not load root CA certificate")
+			log.Panic("Could not load root CA certificate")
 		}
 
 		tlsConfig.RootCAs = roots
@@ -60,7 +64,7 @@ func main() {
 	req, err := http.NewRequest("GET", *engineURL+"/ovirt-engine/api/hosts", nil)
 	check(err)
 	req.Header.Add("Accept", "application/json")
-	req.SetBasicAuth(*engineUser, *enginePassword)
+	req.SetBasicAuth(*engineUser, enginePassword)
 	res, err := client.Do(req)
 	check(err)
 	hosts, err := ioutil.ReadAll(res.Body)
@@ -101,7 +105,7 @@ func writeTargets(fileName string, targets []*Targets) {
 
 func check(e error) {
 	if e != nil {
-		panic(e)
+		log.Fatal(e)
 	}
 }
 
