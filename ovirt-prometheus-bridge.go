@@ -2,10 +2,13 @@ package main
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"flag"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strings"
 )
 
 type Targets struct {
@@ -32,15 +35,28 @@ func main() {
 	engineUser := flag.String("engine-user", "admin@internal", "User")
 	enginePassword := flag.String("engine-password", "engine", "Password")
 	noVerify := flag.Bool("no-verify", false, "Don't verify the engine certificate")
+	engineCa := flag.String("engine-ca", "/etc/pki/vdsm/certs/cacert.pem", "Path to engine ca certificate")
+
 	flag.Parse()
 
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: *noVerify,
 	}
+	if !strings.HasPrefix(*engineURL, "https") {
+		log.Fatal("Only URLs starting with 'https' are supported")
+	}
+	if !*noVerify {
+		roots := x509.NewCertPool()
+		ok := roots.AppendCertsFromPEM(readFile(*engineCa))
+		if !ok {
+			panic("Could not load root CA certificate")
+		}
+
+		tlsConfig.RootCAs = roots
+	}
 	tlsConfig.BuildNameToCertificate()
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: transport}
-
 	req, err := http.NewRequest("GET", *engineURL+"/ovirt-engine/api/hosts", nil)
 	check(err)
 	req.Header.Add("Accept", "application/json")
@@ -87,4 +103,10 @@ func check(e error) {
 	if e != nil {
 		panic(e)
 	}
+}
+
+func readFile(fileName string) []byte {
+	bytes, err := ioutil.ReadFile(fileName)
+	check(err)
+	return bytes
 }
