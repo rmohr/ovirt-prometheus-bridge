@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type Targets struct {
@@ -30,28 +31,50 @@ type Cluster struct {
 	Id string
 }
 
+type Config struct {
+	Target         string
+	URL            string
+	User           string
+	Password       string
+	NoVerify       bool
+	EngineCA       string
+	UpdateInterval int
+}
+
 func main() {
 	target := flag.String("output", "engine-hosts.json", "target for the configuration file")
 	engineURL := flag.String("engine-url", "https://localhost:8443", "Engine URL")
 	engineUser := flag.String("engine-user", "admin@internal", "Engine user")
-	flagEnginePassword := flag.String("engine-password", "engine", "Engine password. Consider using ENGINE_PASSWORD environment variable to set this")
+	enginePassword := flag.String("engine-password", "", "Engine password. Consider using ENGINE_PASSWORD environment variable to set this")
 	noVerify := flag.Bool("no-verify", false, "Don't verify the engine certificate")
 	engineCa := flag.String("engine-ca", "/etc/pki/vdsm/certs/cacert.pem", "Path to engine ca certificate")
+	updateInterval := flag.Int("update-interval", 60, "Update intervall for host discovery in seconds")
 	flag.Parse()
-	enginePassword := os.Getenv("ENGINE_PASSWORD")
-	if enginePassword == "" {
-		enginePassword = *flagEnginePassword
+	if *enginePassword == "" {
+		*enginePassword = os.Getenv("ENGINE_PASSWORD")
+	}
+	config := Config{Target: *target,
+		URL:            *engineURL,
+		User:           *engineUser,
+		Password:       *enginePassword,
+		NoVerify:       *noVerify,
+		EngineCA:       *engineCa,
+		UpdateInterval: *updateInterval,
+	}
+
+	if !strings.HasPrefix(config.URL, "https") {
+		log.Fatal("Only URLs starting with 'https' are supported")
+	}
+	if config.Password == "" {
+		log.Fatal("No engine password supplied")
 	}
 
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify: *noVerify,
+		InsecureSkipVerify: config.NoVerify,
 	}
-	if !strings.HasPrefix(*engineURL, "https") {
-		log.Fatal("Only URLs starting with 'https' are supported")
-	}
-	if !*noVerify {
+	if !config.NoVerify {
 		roots := x509.NewCertPool()
-		ok := roots.AppendCertsFromPEM(readFile(*engineCa))
+		ok := roots.AppendCertsFromPEM(readFile(config.EngineCA))
 		if !ok {
 			log.Panic("Could not load root CA certificate")
 		}
@@ -61,16 +84,29 @@ func main() {
 	tlsConfig.BuildNameToCertificate()
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: transport}
-	req, err := http.NewRequest("GET", *engineURL+"/ovirt-engine/api/hosts", nil)
+	for {
+		Discover(client, &config)
+		time.Sleep(time.Duration(config.UpdateInterval) * time.Second)
+	}
+}
+
+func Discover(client *http.Client, config *Config) {
+	req, err := http.NewRequest("GET", config.URL+"/ovirt-engine/api/hosts", nil)
 	check(err)
 	req.Header.Add("Accept", "application/json")
-	req.SetBasicAuth(*engineUser, enginePassword)
+	req.SetBasicAuth(config.User, config.Password)
 	res, err := client.Do(req)
-	check(err)
+	if err != nil {
+		log.Print(err)
+		return
+	}
 	hosts, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()
-	check(err)
-	writeTargets(*target, MapToTarget(ParseJson(hosts)))
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	writeTargets(config.Target, MapToTarget(ParseJson(hosts)))
 }
 
 func ParseJson(data []byte) *Hosts {
