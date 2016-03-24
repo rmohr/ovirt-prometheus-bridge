@@ -1,14 +1,17 @@
 language: go
 go:
-- 1.3
-- 1.5
-- tip
+  - 1.3
+  - 1.5
+  - tip
 script: go test ./... -v && go build
+before_deploy:
+        - mkdir -p ovirt-prometheus-bridge-$TRAVIS_TAG/bin && mv ovirt-prometheus-bridge  ovirt-prometheus-bridge-$TRAVIS_TAG/bin/
+        - tar -cvzf ovirt-prometheus-bridge-$TRAVIS_TAG.tar.gz ovirt-prometheus-bridge-$TRAVIS_TAG/bin
 deploy:
   provider: releases
   api_key:
     secure: AKTPi1OEbSKMyeakkRSckUmJZQN5DWSxPL99v3uS4oUzm8xjlBBHslSOnFQcL9NgCRyXTOgocreoRBqcLQkgC0JkXAL/IHMruE7wqatYjO+Pe8QfvgwLahma9VzDPm3qoVclP7Karx7+9uUGDE9FSsU/Nuk2s5nj5dkvM7eT4GTk7qFNUVuOC+df1jsmrH8gzu/QabkvQ5gWPW0emPSBvWfkqfDzXJy+1UzjIQ9CtjqYKIeR86C/tlOWICje3CSx+8TI9YI3De+bMmH5ep3x7qNIOCLSyyx/kvdxPxhBxY8QTbh4aCpU+10o3CYp9Rm/UhAHc5cQbAz8A8nYdLoOG/YJiSxPQdwKukyPfHnT1RWe5VHD7qHYIOGzXUrcDeIdp1pUWS6fPc63TDZTP4G+f/vWMYB16iFTz47Gzgo8A6AsKLZwakfDXpRyZBgPV2wx/zTrq70rw1e4aftBH+SpfDWnW9GQfphGb7liyxH8zMDT/FDOcQCNeEhpLos+j53gMwA4PAdNZ3pTTgLboJ3B7oHccRYz4FoOTp1nLYL7NDAMJsic0L6suWkgBz1bgiDstdcVxazQZ+jcA69ZbCTGg8K7fotZQK/FsB6940vZ9jaL8Xo/8zUWfl/ygE0VuBwNji+zqkfuxr874c1OrjMvvny7lXbbPlgRN4LCjLmUMe0=
-  file: ovirt-prometheus-bridge
+  file: ovirt-prometheus-bridge-$TRAVIS_TAG.tar.gz
   skip_cleanup: true
   on:
     repo: rmohr/ovirt-prometheus-bridge
