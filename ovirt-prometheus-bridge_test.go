@@ -54,6 +54,16 @@ func TestWriteJson(t *testing.T) {
 	}
 }
 
+func TestNoTargets(t *testing.T) {
+	writeTargets("generated-targets.json", MapToTarget(&Hosts{}))
+	defer os.Remove("generated-targets.json")
+	generated, err := ioutil.ReadFile("generated-targets.json")
+	check(err)
+	if !bytes.Equal([]byte("[]"), generated) {
+		t.Errorf("Expected '%s', got '%s'", "[]", string(generated))
+	}
+}
+
 func loadJson() *Hosts {
 	data, err := ioutil.ReadFile("hosts.json")
 	check(err)
