@@ -136,7 +136,6 @@ func writeTargets(fileName string, targets []*Targets) {
 	if len(targets) == 0 {
 		err := ioutil.WriteFile(fileName+".new", []byte("[]"), 0644)
 		check(err)
-		return
 	} else {
 		data, _ := json.MarshalIndent(targets, "", "  ")
 		data = append(data, '\n')
