@@ -134,14 +134,16 @@ func MapToTarget(hosts *Hosts) []*Targets {
 
 func writeTargets(fileName string, targets []*Targets) {
 	if len(targets) == 0 {
-		err := ioutil.WriteFile(fileName, []byte("[]"), 0644)
+		err := ioutil.WriteFile(fileName+".new", []byte("[]"), 0644)
 		check(err)
 		return
+	} else {
+		data, _ := json.MarshalIndent(targets, "", "  ")
+		data = append(data, '\n')
+		err := ioutil.WriteFile(fileName+".new", data, 0644)
+		check(err)
 	}
-	data, _ := json.MarshalIndent(targets, "", "  ")
-	data = append(data, '\n')
-	err := ioutil.WriteFile(fileName, data, 0644)
-	check(err)
+	os.Rename(fileName+".new", fileName)
 }
 
 func check(e error) {
