@@ -84,10 +84,7 @@ func main() {
 	tlsConfig.BuildNameToCertificate()
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: transport}
-	for {
-		Discover(client, &config)
-		time.Sleep(time.Duration(config.UpdateInterval) * time.Second)
-	}
+	Discover(client, &config)
 }
 
 func Discover(client *http.Client, config *Config) {
@@ -95,54 +92,96 @@ func Discover(client *http.Client, config *Config) {
 	check(err)
 	req.Header.Add("Accept", "application/json")
 	req.SetBasicAuth(config.User, config.Password)
-	res, err := client.Do(req)
-	if err != nil {
-		log.Print(err)
-		return
-	}
-	hosts, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		log.Print(err)
-		return
-	}
-	writeTargets(config.Target, MapToTarget(ParseJson(hosts)))
-}
 
-func ParseJson(data []byte) *Hosts {
-	hosts := new(Hosts)
-	err := json.Unmarshal(data, hosts)
-	check(err)
-	return hosts
-}
-
-func MapToTarget(hosts *Hosts) []*Targets {
-	targetMap := make(map[string]*Targets)
-	var targets []*Targets
-	for _, host := range hosts.Host {
-		if value, ok := targetMap[host.Cluster.Id]; ok {
-			value.Targets = append(value.Targets, host.Address)
-		} else {
-			targetMap[host.Cluster.Id] = &Targets{
-				Labels:  map[string]string{"cluster": host.Cluster.Id},
-				Targets: []string{host.Address}}
-			targets = append(targets, targetMap[host.Cluster.Id])
+	data := make(chan []byte)
+	done := writeTargets(config.Target, MapToTarget(ParseJson(data)))
+	go func() {
+		defer close(data)
+		for {
+			res, err := client.Do(req)
+			if err != nil {
+				log.Print(err)
+				time.Sleep(time.Duration(config.UpdateInterval) * time.Second)
+				continue
+			}
+			hosts, err := ioutil.ReadAll(res.Body)
+			res.Body.Close()
+			if err != nil {
+				log.Print(err)
+				time.Sleep(time.Duration(config.UpdateInterval) * time.Second)
+				continue
+			}
+			data <- hosts
+			time.Sleep(time.Duration(config.UpdateInterval) * time.Second)
 		}
-	}
-	return targets
+	}()
+	<-done
 }
 
-func writeTargets(fileName string, targets []*Targets) {
-	if len(targets) == 0 {
-		err := ioutil.WriteFile(fileName+".new", []byte("[]"), 0644)
-		check(err)
-	} else {
-		data, _ := json.MarshalIndent(targets, "", "  ")
-		data = append(data, '\n')
-		err := ioutil.WriteFile(fileName+".new", data, 0644)
-		check(err)
-	}
-	os.Rename(fileName+".new", fileName)
+func ParseJson(data chan []byte) chan *Hosts {
+	hostsChan := make(chan *Hosts)
+	go func() {
+		defer close(hostsChan)
+		for msg := range data {
+			hosts := new(Hosts)
+			err := json.Unmarshal(msg, hosts)
+			if err != nil {
+				log.Print(err)
+				continue
+			}
+			hostsChan <- hosts
+		}
+	}()
+	return hostsChan
+}
+
+func MapToTarget(hosts chan *Hosts) chan []*Targets {
+	targetsChan := make(chan []*Targets)
+	go func() {
+		defer close(targetsChan)
+		for msg := range hosts {
+			targetMap := make(map[string]*Targets)
+			var targets []*Targets
+			for _, host := range msg.Host {
+				if value, ok := targetMap[host.Cluster.Id]; ok {
+					value.Targets = append(value.Targets, host.Address)
+				} else {
+					targetMap[host.Cluster.Id] = &Targets{
+						Labels:  map[string]string{"cluster": host.Cluster.Id},
+						Targets: []string{host.Address}}
+					targets = append(targets, targetMap[host.Cluster.Id])
+				}
+			}
+			targetsChan <- targets
+		}
+	}()
+	return targetsChan
+}
+
+func writeTargets(fileName string, targets chan []*Targets) chan error {
+	done := make(chan error)
+	go func() {
+		defer close(done)
+		for msg := range targets {
+			if len(msg) == 0 {
+				err := ioutil.WriteFile(fileName+".new", []byte("[]"), 0644)
+				if err != nil {
+					log.Print(err)
+					continue
+				}
+			} else {
+				data, _ := json.MarshalIndent(msg, "", "  ")
+				data = append(data, '\n')
+				err := ioutil.WriteFile(fileName+".new", data, 0644)
+				if err != nil {
+					log.Print(err)
+					continue
+				}
+			}
+			os.Rename(fileName+".new", fileName)
+		}
+	}()
+	return done
 }
 
 func check(e error) {

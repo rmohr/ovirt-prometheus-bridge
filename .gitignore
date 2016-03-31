@@ -25,3 +25,4 @@ _testmain.go
 
 engine-hosts.json
 ovirt-prometheus-bridge
+*.tar.gz
