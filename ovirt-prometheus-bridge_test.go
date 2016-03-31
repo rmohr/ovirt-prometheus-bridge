@@ -25,14 +25,14 @@ func TestParsingHosts(t *testing.T) {
 
 func TestMapToTarget(t *testing.T) {
 	samples := map[string][]string{
-		"cluster1_id": []string{"host1.com"},
-		"cluster2_id": []string{"host2.com", "host3.com"}}
+		"cluster1_id": []string{"host1.com:8181"},
+		"cluster2_id": []string{"host2.com:8181", "host3.com:8181"}}
 
 	hostsChan := make(chan *Hosts, 1)
 	hosts := loadHosts()
 	hostsChan <- hosts
 	close(hostsChan)
-	result := <-MapToTarget(hostsChan)
+	result := <-MapToTarget(8181, hostsChan)
 	if len(result) != 2 {
 		t.Error("Expected 2, got ", len(result))
 	}
@@ -46,7 +46,7 @@ func TestMapToTarget(t *testing.T) {
 }
 
 func TestWriteJson(t *testing.T) {
-	done := writeTargets("generated-targets.json", MapToTarget(loadHostsIntoChan()))
+	done := writeTargets("generated-targets.json", MapToTarget(8181, loadHostsIntoChan()))
 	<-done
 	defer os.Remove("generated-targets.json")
 	original, err := ioutil.ReadFile("targets.json")
@@ -59,7 +59,7 @@ func TestWriteJson(t *testing.T) {
 }
 
 func TestNoTargets(t *testing.T) {
-	done := writeTargets("generated-targets.json", MapToTarget(noHosts()))
+	done := writeTargets("generated-targets.json", MapToTarget(8181, noHosts()))
 	<-done
 	defer os.Remove("generated-targets.json")
 	generated, err := ioutil.ReadFile("generated-targets.json")

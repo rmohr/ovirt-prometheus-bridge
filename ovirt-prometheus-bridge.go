@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -39,6 +40,7 @@ type Config struct {
 	NoVerify       bool
 	EngineCA       string
 	UpdateInterval int
+	TargetPort     int
 }
 
 func main() {
@@ -49,6 +51,7 @@ func main() {
 	noVerify := flag.Bool("no-verify", false, "Don't verify the engine certificate")
 	engineCa := flag.String("engine-ca", "/etc/pki/vdsm/certs/cacert.pem", "Path to engine ca certificate")
 	updateInterval := flag.Int("update-interval", 60, "Update intervall for host discovery in seconds")
+	targetPort := flag.Int("host-port", 8181, "Port where Prometheus metrics are exposed on the hosts")
 	flag.Parse()
 	if *enginePassword == "" {
 		*enginePassword = os.Getenv("ENGINE_PASSWORD")
@@ -60,6 +63,7 @@ func main() {
 		NoVerify:       *noVerify,
 		EngineCA:       *engineCa,
 		UpdateInterval: *updateInterval,
+		TargetPort:     *targetPort,
 	}
 
 	if !strings.HasPrefix(config.URL, "https") {
@@ -94,7 +98,7 @@ func Discover(client *http.Client, config *Config) {
 	req.SetBasicAuth(config.User, config.Password)
 
 	data := make(chan []byte)
-	done := writeTargets(config.Target, MapToTarget(ParseJson(data)))
+	done := writeTargets(config.Target, MapToTarget(config.TargetPort, ParseJson(data)))
 	go func() {
 		defer close(data)
 		for {
@@ -135,7 +139,7 @@ func ParseJson(data chan []byte) chan *Hosts {
 	return hostsChan
 }
 
-func MapToTarget(hosts chan *Hosts) chan []*Targets {
+func MapToTarget(targetPort int, hosts chan *Hosts) chan []*Targets {
 	targetsChan := make(chan []*Targets)
 	go func() {
 		defer close(targetsChan)
@@ -144,11 +148,11 @@ func MapToTarget(hosts chan *Hosts) chan []*Targets {
 			var targets []*Targets
 			for _, host := range msg.Host {
 				if value, ok := targetMap[host.Cluster.Id]; ok {
-					value.Targets = append(value.Targets, host.Address)
+					value.Targets = append(value.Targets, host.Address+":"+strconv.Itoa(targetPort))
 				} else {
 					targetMap[host.Cluster.Id] = &Targets{
 						Labels:  map[string]string{"cluster": host.Cluster.Id},
-						Targets: []string{host.Address}}
+						Targets: []string{host.Address + ":" + strconv.Itoa(targetPort)}}
 					targets = append(targets, targetMap[host.Cluster.Id])
 				}
 			}

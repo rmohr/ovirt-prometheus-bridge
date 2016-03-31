@@ -1,7 +1,7 @@
 [
   {
     "targets": [
-      "host1.com"
+      "host1.com:8181"
     ],
     "labels": {
       "cluster": "cluster1_id"
@@ -9,8 +9,8 @@
   },
   {
     "targets": [
-      "host2.com",
-      "host3.com"
+      "host2.com:8181",
+      "host3.com:8181"
     ],
     "labels": {
       "cluster": "cluster2_id"
