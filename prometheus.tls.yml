@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+
+  external_labels:
+    monitor: 'ovirt'
+
+scrape_configs:
+  - job_name: 'prometheus'
+
+    scrape_interval: 5s
+
+    target_groups:
+      - targets: ['localhost:9090']
+        labels:
+          group: 'prometheus'
+
+  - job_name: 'vdsm'
+
+    scheme: 'https'
+    tls_config:
+      ca_file: '/etc/pki/prom/certs/cacert.pem'
+      cert_file: '/etc/pki/prom/certs/promcert.pem'
+      key_file: '/etc/pki/prom/certs/promkey.pem'
+      insecure_skip_verify: false
+    scrape_interval: 5s
+    file_sd_configs:
+      - names : ['/targets/*.json']
+
+
