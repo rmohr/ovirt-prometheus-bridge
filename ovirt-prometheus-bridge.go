@@ -49,7 +49,7 @@ func main() {
 	engineUser := flag.String("engine-user", "admin@internal", "Engine user")
 	enginePassword := flag.String("engine-password", "", "Engine password. Consider using ENGINE_PASSWORD environment variable to set this")
 	noVerify := flag.Bool("no-verify", false, "Don't verify the engine certificate")
-	engineCa := flag.String("engine-ca", "/etc/pki/vdsm/certs/cacert.pem", "Path to engine ca certificate")
+	engineCa := flag.String("engine-ca", "/etc/pki/ovirt-engine/ca.pem", "Path to engine ca certificate")
 	updateInterval := flag.Int("update-interval", 60, "Update intervall for host discovery in seconds")
 	targetPort := flag.Int("host-port", 8181, "Port where Prometheus metrics are exposed on the hosts")
 	flag.Parse()
