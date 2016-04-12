@@ -7,6 +7,12 @@ script: go test ./... -v && go build
 before_deploy:
         - mkdir -p ovirt-prometheus-bridge-$TRAVIS_TAG/bin && mv ovirt-prometheus-bridge  ovirt-prometheus-bridge-$TRAVIS_TAG/bin/
         - tar -cvzf ovirt-prometheus-bridge-$TRAVIS_TAG.tar.gz ovirt-prometheus-bridge-$TRAVIS_TAG/bin
+after_deploy:
+        - |- 
+          curl -H "Content-Type: application/json" --data "{\"source_type\": \"Tag\", \"source_name\": \"$TRAVIS_TAG\"}" -X POST https://registry.hub.docker.com/u/rmohr/ovirt-prometheus-bridge/trigger/$DOCKER_HUB_TOKEN/
+env:
+  global:
+    - secure: onw2jPsXYcu5grEep8wuVNf16jetXS+vDEuXaWYnfphB1Qu3JseNPOqLz1/YinI8nCAkOoMS+CpWRX5H0GkLlouizioNxRaPt8sw+B+XyiWsH5s1OnJUADAS9WRQB5BUfRpkFC2DAyaR4EvGlfZOu6CHh9nKuHLRW0jTT/2hXKbjgsnkqa1M86+z78308Rzdtrtses/4mvJAY2Xc6N+TiJtJtZKJ+zn4+FCyuzBko0Z2ocIXr4i500cQtLqhzha1c3nKooB25wDd+B39yoH5b8fot9zg+0jT/isUfhEkPUC5yNcQCsMg87IZ2mSa7td8Gh3XB6AzN/FLxUXZrN1+rpi5ClRjO1AjoN+0qh/OsesWY2tbgiR81OB+Y2QPVoQuCB15Z1hT5IB2emJTUJ4xVUI16NlU+Y9zQBGK+8PqdWUT/IcM0SdCW0lmCiUx6kbl9rIGf4kRLKFQHg+a3HVmQEvaFH774yMRin45qLarGv+eY502fYPjvl15M4Ey/V6o10avWQ9pndwfPRGOhCofYgKBrHFPi0bTpAyPNFFNg1gMCHru7IOI23fG9e/aqyocUEFmAcdDl1XBN+Aits9MzGEbup9vssZfUM8fXFimk/xit+xlTF5cYe04iZDuJv+EMMhDQks6urnA75omXFhct2AwC7XIoqOFG0MWsQATsEI=
 deploy:
   provider: releases
   api_key:
@@ -17,3 +23,4 @@ deploy:
     repo: rmohr/ovirt-prometheus-bridge
     tags: true
     go: '1.5'
+
