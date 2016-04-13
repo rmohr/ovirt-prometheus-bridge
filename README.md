@@ -89,3 +89,25 @@ scrape_configs:
     file_sd_configs:
       - names : ['/targets/*.json']
 ```
+
+# Quick start
+
+To quickly spawn ovirt-prometheus-bridge, Prometheus and Grafana you can use
+the Docker compose file in this repository:
+
+```bash
+export HOSTIP=$OVIRT_ENGINE_IP
+export ENGINE_PASSWORD=$OVIRT_ENGINE_PASSWORD
+docker-compose up
+```
+
+Then add the Prometheus datasource to Grafana:
+
+```bash
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" --data '{ "name":"oVirt", "type":"prometheus", "url":"http://prometheus:9090", "access":"proxy", "basicAuth":false }' http://admin:admin@localhost:3000/api/datasources
+```
+
+Prometheus will then listen on [localhost:9090](http://localhost:9090), Grafana
+on [localhost:3000](http://localhost:3000) and ovirt-prometheus-bridge will
+provide the scrape targets. The default credentials for Grafana are
+`admin:admin`.
