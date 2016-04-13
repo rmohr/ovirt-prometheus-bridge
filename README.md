@@ -10,7 +10,7 @@ then start collecting metrics from all hosts in your virtual datacenter where
 
 In this example
 ```bash
-ENGINE_PASSWORD=engine ./ovirt-prometheus-bridge -update-interval 60 -engine-ca /etc/pki/ovirt-engine/ca.pem -output /targets/targets.json
+docker run -e ENGINE_PASSWORD=engine -v $PWD:/targets rmohr/ovirt-prometheus-bridge -update-interval 60 -no-verify -engine-url=https://localhost:8443 -output /targets/targets.json
 ```
 the service is querying the oVirt Engine API every 60 seconds and writes the
 found hosts into the file `targets.json`.  The created file `targets.json`
