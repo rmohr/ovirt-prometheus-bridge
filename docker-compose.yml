@@ -2,7 +2,7 @@ ovirt-prometheus-bridge:
   image: rmohr/ovirt-prometheus-bridge
   volumes:
     - /targets
-  command: ["-no-verify", "-engine-url=https://${HOSTIP}:8443", "-output=/targets/hosts.json"]
+  command: ["-no-verify", "-engine-url=${ENGINE_HOST}", "-output=/targets/hosts.json"]
   environment:
     - ENGINE_PASSWORD
 prometheus:

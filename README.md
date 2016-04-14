@@ -96,7 +96,7 @@ To quickly spawn ovirt-prometheus-bridge, Prometheus and Grafana you can use
 the Docker compose file in this repository:
 
 ```bash
-export HOSTIP=$OVIRT_ENGINE_IP
+export ENGINE_HOST=https://$ENGINE_FQDN
 export ENGINE_PASSWORD=$OVIRT_ENGINE_PASSWORD
 docker-compose up
 ```
