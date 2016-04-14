@@ -43,7 +43,7 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
 
-    scrape_interval: 5s
+    scrape_interval: 10s
 
     target_groups:
       - targets: ['localhost:9090']
@@ -70,7 +70,7 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
 
-    scrape_interval: 5s
+    scrape_interval: 10s
 
     target_groups:
       - targets: ['localhost:9090']
